@@ -20,13 +20,21 @@ ui <- fluidPage(
               ),
               checkboxGroupButtons("month",
                 label = "Choose month:",
-                choices = c("Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"),
-                individual = TRUE, justified = FALSE, selected = c("Nov", "Dec", "Jan"),
+                choices = c(
+                  "Jan", "Feb", "Mar",
+                  "Apr", "May", "Jun",
+                  "Jul", "Aug", "Sep",
+                  "Oct", "Nov", "Dec"
+                ),
+                individual = TRUE,
+                justified = FALSE,
+                selected = c("Nov", "Dec", "Jan"),
                 width = "100%"
               ),
               checkboxGroupInput("reason",
                 label = "Choose reason:",
-                choices = levels(factor(mydata$new_cause)), selected = c("lightning", "arson", "accident")
+                choices = levels(factor(mydata$new_cause)),
+                selected = c("lightning", "arson", "accident")
               ),
               actionButton("showd", "Show density plot"),
               actionButton("cleard", "Clear density plot")
@@ -39,10 +47,12 @@ ui <- fluidPage(
         column(
           4,
           conditionalPanel(
-            # The conditionals are set based on whether coordinates are being clicked on.
-            condition = "output.condition1 == 0", # TODO: rename condition1 to a more descriptive name
+            # The conditionals are set based on
+            # whether coordinates are being clicked on.
+            # TODO: rename condition1 to a more descriptive name
+            condition = "output.condition1 == 0",
             br(),
-            tags$h4("About", style = "color:blue"), 
+            tags$h4("About", style = "color:blue"),
             p(
               "This Shiny App helps visualise fires in Victoria for last two decades.
               YAfter choose the year, month, and ignition reason. The fires match these condition will automatically shown on the map.
@@ -51,12 +61,15 @@ ui <- fluidPage(
             )
           ),
           conditionalPanel(
-            condition = "output.condition1 == 1", # TODO: rename condition1 to a more descriptive name
+            condition = "output.condition1 == 1",
+            # TODO: rename condition1 to a more descriptive name
             tabsetPanel(
               tabPanel(
                 tags$em("Percentage", style = "font-size:100%"),
-                plotlyOutput("p1", height = 300), # TODO: rename ids to more descriptive name
-                plotlyOutput("p2", height = 200) # TODO: rename ids to more descriptive name
+                # TODO: rename ids to more descriptive name
+                plotlyOutput("p1", height = 300),
+                # TODO: rename ids to more descriptive name
+                plotlyOutput("p2", height = 200)
               ),
               tabPanel(
                 tags$em("Rainfall", style = "font-size:100%"),
@@ -89,7 +102,8 @@ ui <- fluidPage(
               ),
               checkboxGroupInput("reason1",
                 label = "Choose reason:",
-                choices = levels(factor(prediction$new_cause)), selected = c("arson", "lightning", "accident")
+                choices = levels(factor(prediction$new_cause)),
+                selected = c("arson", "lightning", "accident")
               )
             ),
             mainPanel(leafletOutput(outputId = "map2", height = 587))
@@ -98,7 +112,8 @@ ui <- fluidPage(
         column(
           4,
           conditionalPanel(
-            condition = "output.condition2 == 0", # TODO: rename condition2 to a more descriptive name
+            # TODO: rename condition2 to a more descriptive name
+            condition = "output.condition2 == 0",
             br(),
             tags$h4("About this page", style = "color:blue"),
             p(
@@ -108,7 +123,8 @@ ui <- fluidPage(
             )
           ),
           conditionalPanel(
-            condition = "output.condition2 == 1", # TODO: rename condition2 to a more descriptive name
+            # TODO: rename condition2 to a more descriptive name
+            condition = "output.condition2 == 1",
             tabsetPanel(
               tabPanel(
                 tags$em("Rainfall", style = "font-size:100%"),
@@ -135,33 +151,18 @@ ui <- fluidPage(
               helpText("Predicted fire probability maps"),
               radioButtons("month2",
                 label = "Choose month:",
-                choices = c("Oct", "Nov", "Dec", "Jan", "Feb", "Mar"), selected = c("Oct")
+                choices = c("Oct", "Nov", "Dec", "Jan", "Feb", "Mar"),
+                selected = c("Oct")
               ),
               radioButtons("reason2",
                 label = "Choose reason:",
-                choices = levels(factor(prediction$new_cause)), selected = c("arson")
+                choices = levels(factor(prediction$new_cause)),
+                selected = c("arson")
               )
             ),
             mainPanel(leafletOutput(outputId = "map3", height = 587))
           )
-        ),
-        # wellPanel(
-        #     tabsetPanel(
-        #         # tabPanel(tags$em("Percentage",style="font-size:100%"),
-        #         #          tags$hr(style="border-color: #ffc266;"),
-        #         #          plotlyOutput("p3"),
-        #         #          plotlyOutput("p4")
-        #         # ),
-        #
-        #         tabPanel(tags$em("Rainfall",style="font-size:100%"),
-        #                  tags$hr(style="border-color:  #d27979;"),
-        #                  plotlyOutput("rain1")),
-        #
-        #         tabPanel(tags$em("Temperature",style="font-size:100%"),
-        #                  tags$hr(style="border-color:  #ffc266;"),
-        #                  plotlyOutput("temp1"))
-        #     )
-        # )
+        )
       )
     ),
     tabPanel("Data", DT::dataTableOutput("data")),
