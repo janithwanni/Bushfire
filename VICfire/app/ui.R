@@ -39,20 +39,24 @@ ui <- fluidPage(
         column(
           4,
           conditionalPanel(
-            condition = "output.condition1 == 0",
+            # The conditionals are set based on whether coordinates are being clicked on.
+            condition = "output.condition1 == 0", # TODO: rename condition1 to a more descriptive name
             br(),
-            tags$h4("About", style = "color:blue"), p("This Shiny App helps visualise fires in Victoria for last two decades.
-                            YAfter choose the year, month, and ignition reason. The fires match these condition will automatically shown on the map.
-                                                                                 Due to the limitation of the package, the density plot cannot be refreshed automatically. Each time you change the conditions, you have to clear and re-plot the densitiy plot.
-                                                                                 By clicking a fire on the map, relevant infomation will pop up and weather infomation will be shown below.")
+            tags$h4("About", style = "color:blue"), 
+            p(
+              "This Shiny App helps visualise fires in Victoria for last two decades.
+              YAfter choose the year, month, and ignition reason. The fires match these condition will automatically shown on the map.
+              Due to the limitation of the package, the density plot cannot be refreshed automatically. Each time you change the conditions, you have to clear and re-plot the densitiy plot.
+              By clicking a fire on the map, relevant infomation will pop up and weather infomation will be shown below."
+            )
           ),
           conditionalPanel(
-            condition = "output.condition1 == 1",
+            condition = "output.condition1 == 1", # TODO: rename condition1 to a more descriptive name
             tabsetPanel(
               tabPanel(
                 tags$em("Percentage", style = "font-size:100%"),
-                plotlyOutput("p1", height = 300),
-                plotlyOutput("p2", height = 200)
+                plotlyOutput("p1", height = 300), # TODO: rename ids to more descriptive name
+                plotlyOutput("p2", height = 200) # TODO: rename ids to more descriptive name
               ),
               tabPanel(
                 tags$em("Rainfall", style = "font-size:100%"),
@@ -94,15 +98,17 @@ ui <- fluidPage(
         column(
           4,
           conditionalPanel(
-            condition = "output.condition2 == 0",
+            condition = "output.condition2 == 0", # TODO: rename condition2 to a more descriptive name
             br(),
             tags$h4("About this page", style = "color:blue"),
-            p("The fires shown on this page happened 2019.10-2020.4 located by Himawari 8. The causes of such fires are yet to be investigated.
-                                                          All ignition reasons are predicted based on our model.
-                                                          By clicking a fire on the map, relevant infomation will pop up and weather infomation will be shown below.")
+            p(
+              "The fires shown on this page happened 2019.10-2020.4 located by Himawari 8. The causes of such fires are yet to be investigated.
+              All ignition reasons are predicted based on our model.
+              By clicking a fire on the map, relevant infomation will pop up and weather infomation will be shown below."
+            )
           ),
           conditionalPanel(
-            condition = "output.condition2 == 1",
+            condition = "output.condition2 == 1", # TODO: rename condition2 to a more descriptive name
             tabsetPanel(
               tabPanel(
                 tags$em("Rainfall", style = "font-size:100%"),
