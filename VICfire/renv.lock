@@ -1193,6 +1193,17 @@
       ],
       "Hash": "337d6d70f7d6bf78df236a5a53f09db0"
     },
+    "reactlog": {
+      "Package": "reactlog",
+      "Version": "1.1.1",
+      "Source": "Repository",
+      "Repository": "CRAN",
+      "Requirements": [
+        "R",
+        "jsonlite"
+      ],
+      "Hash": "745883ab4ed03f20593cd27334712eaf"
+    },
     "readr": {
       "Package": "readr",
       "Version": "2.1.4",

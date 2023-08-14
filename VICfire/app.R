@@ -14,5 +14,7 @@ y <- seq(ystart + 0.1 / 2, yend - 0.1 / 2, .1)
 x <- seq(xstart + 0.181 / 2, xend - 0.181 / 2, 0.181)
 png <- "https://cdn.cfa.vic.gov.au/o/cfa-theme/images/cfa-logo.png"
 
+reactlog::reactlog_enable()
+
 # Run app ----
 shiny::shinyAppDir("app/")
