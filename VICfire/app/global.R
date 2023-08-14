@@ -15,5 +15,7 @@ library(raster)
 library(DT)
 library(htmlwidgets)
 
+source("logic/color_palettes.R")
+
 # Load in training data
 load("data/save.RData")
