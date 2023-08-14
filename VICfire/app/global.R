@@ -1,0 +1,19 @@
+# Load library
+library(shiny)
+library(dplyr)
+library(leaflet)
+library(readr)
+library(KernSmooth)
+library(shinyWidgets)
+library(plotly)
+library(sp)
+library(mapview)
+library(leafem)
+library(rgdal)
+library(maptools)
+library(raster)
+library(DT)
+library(htmlwidgets)
+
+# Load in training data
+load("data/save.RData")

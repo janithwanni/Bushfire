@@ -15,4 +15,4 @@ x <- seq(xstart + 0.181 / 2, xend - 0.181 / 2, 0.181)
 png <- "https://cdn.cfa.vic.gov.au/o/cfa-theme/images/cfa-logo.png"
 
 # Run app ----
-shinyApp(ui, server)
+shiny::shinyAppDir("app/")
