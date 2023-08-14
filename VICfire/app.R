@@ -1,31 +1,9 @@
-# Load library
-library(shiny)
-library(dplyr)
-library(leaflet)
-library(readr)
-library(KernSmooth)
-library(shinyWidgets)
-library(plotly)
-library(sp)
-library(mapview)
-library(leafem)
-library(rgdal)
-library(maptools)
-library(raster)
-library(DT)
-library(htmlwidgets)
-
-
 js <- c(
     "function(el, x){",
     "  el.on('plotly_legendclick', function(evtData) {",
     "    Shiny.setInputValue('trace', evtData.data[evtData.curveNumber].name);",
     "  });",
     "}")
-
-
-# Load in training data
-load("save.RData")
 
 ystart = -39.08246
 yend = -34.03690
