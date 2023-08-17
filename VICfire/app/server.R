@@ -1,3 +1,9 @@
+box::use(
+  app/logic/color_palettes[
+    pal, pal1, pal2, palRaster
+  ]
+)
+
 # Server logic ----
 server <- function(input, output) {
   # subsets mydata based on year selector
