@@ -17,6 +17,7 @@ box::use(
   app/data/data[prediction]
 )
 
+#' @export
 ui <- function(id) {
   ns <- NS(id)
   fluidRow(
@@ -42,6 +43,7 @@ ui <- function(id) {
   )
 }
 
+#' @export
 server <- function(id) {
   moduleServer(id, function(input, output, session) {
 
