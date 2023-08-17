@@ -1,4 +1,72 @@
 box::use(
+  shiny[
+    reactive,
+    reactiveValues,
+    observeEvent,
+    outputOptions,
+    renderText
+  ],
+  sp[
+    Polygon,
+    SpatialPolygonsDataFrame,
+    SpatialPolygons
+  ],
+  dplyr[
+    filter,
+    group_by
+  ],
+  KernSmooth[bkde2D],
+  magrittr[`%>%`],
+  grDevices[contourLines],
+  plotly[
+    renderPlotly,
+    plot_ly,
+    add_trace,
+    add_lines,
+    add_histogram,
+    layout,
+    highlight_key
+  ],
+  ggplot2[
+    ggplot,
+    aes,
+    geom_bar
+  ],
+  htmlwidgets[onRender],
+  leaflet[
+    leaflet,
+    leafletProxy,
+    renderLeaflet,
+    setView,
+    addTiles,
+    addProviderTiles,
+    addLegend,
+    addLayersControl,
+    addCircles,
+    addCircleMarkers,
+    addPolygons,
+    addRasterImage,
+    clearMarkers,
+    clearGroup,
+    clearShapes,
+    hideGroup
+  ],
+  leafem[addLogo, addMouseCoordinates],
+  raster[raster],
+  DT[renderDataTable, datatable]
+)
+
+box::use(
+  app/data/data[
+    mydata, mydata1, mydata2, mydata4,
+    prediction,
+    r10a, r10ac, r10l, r10b,
+    r11a, r11ac, r11l, r11b,
+    r12a, r12ac, r12l, r12b,
+    r1a, r1ac, r1l, r1b,
+    r2a, r2ac, r2l, r2b,
+    r3a, r3ac, r3l, r3b
+  ],
   app/logic/color_palettes[
     pal, pal1, pal2, palRaster
   ]
@@ -334,6 +402,7 @@ server <- function(input, output) {
     group_by(new_cause) %>%
     add_lines(x = ~year, y = ~Total, legendgroup = ~new_cause)
   hist <- add_histogram(base, x = ~Total, histnorm = "probability density")
+  # TODO: Is this ggplot even being used?
   gig <- ggplot(mydata2, aes(x = year, y = Total, fill = new_cause)) +
     geom_bar(stat = "identity")
   fig <- plot_ly(mydata4,
