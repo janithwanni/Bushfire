@@ -1,3 +1,7 @@
+box::use(
+  KernSmooth[bkde2D]
+)
+
 load("data/save.RData")
 
 # The following pattern of assigning the same variable
@@ -15,6 +19,13 @@ mydata4 <- mydata4
 
 #' @export
 prediction <- prediction
+
+#' @export
+d0d <- bkde2D(
+  cbind(mydata$lon, mydata$lat),
+  bandwidth = c(.0045, .0068),
+  gridsize = c(50, 50)
+)
 
 # thank god there were only 6 * 4 combinations
 #' @export

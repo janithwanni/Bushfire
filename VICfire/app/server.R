@@ -61,15 +61,20 @@ box::use(
     mydata, mydata1, mydata2, mydata4,
     prediction,
     risk_map,
+    d0d
   ],
   app/logic/constants[density_cutoff_value],
   app/logic/color_palettes[
     pal, pal1, pal2, palRaster
-  ]
+  ],
+  app/views/mod_fire_risk_map
 )
 
 # Server logic ----
 server <- function(input, output) {
+
+  mod_fire_risk_map$server("fire_risk_map")
+
   # subsets mydata based on year selector
   dataselected_1 <- reactive({
     mydata <- subset(mydata, year >= input$year[1] & year <= input$year[2])
@@ -102,13 +107,6 @@ server <- function(input, output) {
       pre_1() %>% filter(new_cause %in% input$reason1)
     }
   })
-
-  # TODO precalculate this?
-  d0d <- bkde2D(
-    cbind(mydata$lon, mydata$lat),
-    bandwidth = c(.0045, .0068),
-    gridsize = c(50, 50)
-  )
 
   # density polygons
   selectedarson <- reactive({
@@ -572,50 +570,6 @@ server <- function(input, output) {
           "Distance to road: ", round(dist_road)
         )
       )
-  })
-
-
-  KernelDensityRaster <- raster(
-    list(
-      x = d0d$x1,
-      y = d0d$x2,
-      z = risk_map[["arson"]][["Oct"]]
-    )
-  )
-  KernelDensityRaster@data@values[
-    which(
-      KernelDensityRaster@data@values < density_cutoff_value
-    )
-  ] <- NA
-
-  output$map3 <- renderLeaflet({
-    leaflet() %>%
-      addProviderTiles("CartoDB") %>%
-      setView(lng = 144.7852, lat = -36.3913, zoom = 6.3) %>%
-      addLegend(
-        pal = palRaster, values = c(1, 0),
-        title = "Fire Probability"
-      ) %>%
-      addRasterImage(KernelDensityRaster, colors = palRaster, opacity = .4)
-  })
-
-  observe({
-    req(!is.null(input$reason2) & !is.null(input$month2))
-    leafletProxy("map3") %>%
-      addProviderTiles("CartoDB") %>%
-      clearShapes()
-
-    KernelDensityRaster <- raster(
-      list(
-        x = d0d$x1, y = d0d$x2,
-        z = risk_map[[input$reason2]][[input$month2]]
-      )
-    )
-    KernelDensityRaster@data@values[
-      which(KernelDensityRaster@data@values < density_cutoff_value)
-    ] <- NA
-    leafletProxy("map3") %>%
-      addRasterImage(KernelDensityRaster, colors = palRaster, opacity = .4)
   })
 
   output$data <- DT::renderDataTable(datatable(
