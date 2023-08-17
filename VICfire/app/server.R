@@ -67,13 +67,15 @@ box::use(
   app/logic/color_palettes[
     pal, pal1, pal2, palRaster
   ],
-  app/views/mod_fire_risk_map
+  app/views/mod_fire_risk_map,
+  app/views/mod_predicted_causes
 )
 
 # Server logic ----
 server <- function(input, output) {
 
   mod_fire_risk_map$server("fire_risk_map")
+  mod_predicted_causes$server("predicted_causes")
 
   # subsets mydata based on year selector
   dataselected_1 <- reactive({
@@ -91,20 +93,6 @@ server <- function(input, output) {
       subset(dataselected_2(), new_cause == 1)
     } else {
       dataselected_2() %>% filter(new_cause %in% input$reason)
-    }
-  })
-
-  # subsets prediction by month
-  pre_1 <- reactive({
-    subset(prediction, month %in% input$month1)
-  })
-
-  # subsets pre_1() by reason
-  pre_2 <- reactive({
-    if (is.null(input$reason1)) {
-      subset(pre_1(), new_cause == 1)
-    } else {
-      pre_1() %>% filter(new_cause %in% input$reason1)
     }
   })
 
@@ -467,8 +455,6 @@ server <- function(input, output) {
       hideGroup("show all fire")
   })
 
-
-
   observe({
     leafletProxy("map") %>%
       clearMarkers() %>%
@@ -487,7 +473,6 @@ server <- function(input, output) {
         )
       )
   })
-
 
   observeEvent(input$showd, {
     leafletProxy("map") %>%
@@ -531,45 +516,10 @@ server <- function(input, output) {
     }
   })
 
-
   observeEvent(input$cleard, {
     leafletProxy("map") %>%
       addTiles() %>%
       clearGroup(group = "plot density")
-  })
-
-
-  output$map2 <- renderLeaflet({
-    leaflet() %>%
-      addTiles() %>%
-      addLegend(pal = pal1, values = prediction$new_cause) %>%
-      setView(lng = 144.7852, lat = -36.3913, zoom = 6.3) %>%
-      addMouseCoordinates() %>%
-      addCircleMarkers(
-        data = pre_2(), lat = ~lat, lng = ~lon,
-        radius = 3,
-        color = ~ pal1(new_cause),
-        stroke = FALSE, fillOpacity = 20
-      )
-  })
-
-
-
-
-  observe({
-    leafletProxy("map2") %>%
-      clearMarkers() %>%
-      addCircleMarkers(
-        data = pre_2(), lat = ~lat, lng = ~lon,
-        radius = 3,
-        color = ~ pal1(new_cause),
-        stroke = FALSE, fillOpacity = 20,
-        popup = ~ paste0(
-          "Fire reason: ", new_cause, "<br/>",
-          "Forest types: ", FOR_TYPE, "<br/>",
-          "Distance to road: ", round(dist_road)
-        )
-      )
   })
 
   output$data <- DT::renderDataTable(datatable(
