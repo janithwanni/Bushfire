@@ -24,7 +24,8 @@ box::use(
 )
 box::use(
   app/data/data[prediction],
-  app/views/mod_historical_fire_map
+  app/views/mod_historical_fire_map,
+  app/views/mod_fire_risk_map
 )
 # User interface ----
 ui <- fluidPage(
@@ -91,27 +92,7 @@ ui <- fluidPage(
     ),
     tabPanel(
       "Fire risk map",
-      fluidRow(
-        column(8,
-          align = "left",
-          sidebarLayout(
-            sidebarPanel(
-              helpText("Predicted fire probability maps"),
-              radioButtons("month2",
-                label = "Choose month:",
-                choices = c("Oct", "Nov", "Dec", "Jan", "Feb", "Mar"),
-                selected = c("Oct")
-              ),
-              radioButtons("reason2",
-                label = "Choose reason:",
-                choices = levels(factor(prediction$new_cause)),
-                selected = c("arson")
-              )
-            ),
-            mainPanel(leafletOutput(outputId = "map3", height = 587))
-          )
-        )
-      )
+      mod_fire_risk_map$ui("fire_risk_map")
     ),
     tabPanel("Data", dataTableOutput("data")),
     tabPanel("Information", includeMarkdown("readme.md"))
