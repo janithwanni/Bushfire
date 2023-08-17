@@ -60,13 +60,9 @@ box::use(
   app/data/data[
     mydata, mydata1, mydata2, mydata4,
     prediction,
-    r10a, r10ac, r10l, r10b,
-    r11a, r11ac, r11l, r11b,
-    r12a, r12ac, r12l, r12b,
-    r1a, r1ac, r1l, r1b,
-    r2a, r2ac, r2l, r2b,
-    r3a, r3ac, r3l, r3b
+    risk_map,
   ],
+  app/logic/constants[density_cutoff_value],
   app/logic/color_palettes[
     pal, pal1, pal2, palRaster
   ]
@@ -579,8 +575,18 @@ server <- function(input, output) {
   })
 
 
-  KernelDensityRaster <- raster(list(x = d0d$x1, y = d0d$x2, z = r10a))
-  KernelDensityRaster@data@values[which(KernelDensityRaster@data@values < 0.07)] <- NA
+  KernelDensityRaster <- raster(
+    list(
+      x = d0d$x1,
+      y = d0d$x2,
+      z = risk_map[["arson"]][["Oct"]]
+    )
+  )
+  KernelDensityRaster@data@values[
+    which(
+      KernelDensityRaster@data@values < density_cutoff_value
+    )
+  ] <- NA
 
   output$map3 <- renderLeaflet({
     leaflet() %>%
@@ -594,202 +600,22 @@ server <- function(input, output) {
   })
 
   observe({
+    req(!is.null(input$reason2) & !is.null(input$month2))
     leafletProxy("map3") %>%
       addProviderTiles("CartoDB") %>%
       clearShapes()
 
-    # r10a, r10ac, ... etc. are loaded from save.RData
-    if ("arson" %in% input$reason2 & "Oct" %in% input$month2) {
-      KernelDensityRaster <- raster(list(x = d0d$x1, y = d0d$x2, z = r10a))
-      KernelDensityRaster@data@values[which(KernelDensityRaster@data@values < 0.07)] <- NA
-
-      leafletProxy("map3") %>%
-        addRasterImage(KernelDensityRaster, colors = palRaster, opacity = .4)
-    }
-
-    if ("accident" %in% input$reason2 & "Oct" %in% input$month2) {
-      KernelDensityRaster <- raster(list(x = d0d$x1, y = d0d$x2, z = r10ac))
-      KernelDensityRaster@data@values[which(KernelDensityRaster@data@values < 0.07)] <- NA
-
-      leafletProxy("map3") %>%
-        addRasterImage(KernelDensityRaster, colors = palRaster, opacity = .4)
-    }
-
-    if ("lightning" %in% input$reason2 & "Oct" %in% input$month2) {
-      KernelDensityRaster <- raster(list(x = d0d$x1, y = d0d$x2, z = r10l))
-      KernelDensityRaster@data@values[which(KernelDensityRaster@data@values < 0.07)] <- NA
-
-      leafletProxy("map3") %>%
-        addRasterImage(KernelDensityRaster, colors = palRaster, opacity = .4)
-    }
-
-    if ("burningoff" %in% input$reason2 & "Oct" %in% input$month2) {
-      KernelDensityRaster <- raster(list(x = d0d$x1, y = d0d$x2, z = r10b))
-      KernelDensityRaster@data@values[which(KernelDensityRaster@data@values < 0.07)] <- NA
-
-      leafletProxy("map3") %>%
-        addRasterImage(KernelDensityRaster, colors = palRaster, opacity = .4)
-    }
-
-    if ("arson" %in% input$reason2 & "Nov" %in% input$month2) {
-      KernelDensityRaster <- raster(list(x = d0d$x1, y = d0d$x2, z = r11a))
-      KernelDensityRaster@data@values[which(KernelDensityRaster@data@values < 0.07)] <- NA
-
-      leafletProxy("map3") %>%
-        addRasterImage(KernelDensityRaster, colors = palRaster, opacity = .4)
-    }
-
-    if ("accident" %in% input$reason2 & "Nov" %in% input$month2) {
-      KernelDensityRaster <- raster(list(x = d0d$x1, y = d0d$x2, z = r11ac))
-      KernelDensityRaster@data@values[which(KernelDensityRaster@data@values < 0.07)] <- NA
-
-      leafletProxy("map3") %>%
-        addRasterImage(KernelDensityRaster, colors = palRaster, opacity = .4)
-    }
-
-    if ("lightning" %in% input$reason2 & "Nov" %in% input$month2) {
-      KernelDensityRaster <- raster(list(x = d0d$x1, y = d0d$x2, z = r11l))
-      KernelDensityRaster@data@values[which(KernelDensityRaster@data@values < 0.07)] <- NA
-
-      leafletProxy("map3") %>%
-        addRasterImage(KernelDensityRaster, colors = palRaster, opacity = .4)
-    }
-
-    if ("burningoff" %in% input$reason2 & "Nov" %in% input$month2) {
-      KernelDensityRaster <- raster(list(x = d0d$x1, y = d0d$x2, z = r11b))
-      KernelDensityRaster@data@values[which(KernelDensityRaster@data@values < 0.07)] <- NA
-
-      leafletProxy("map3") %>%
-        addRasterImage(KernelDensityRaster, colors = palRaster, opacity = .4)
-    }
-
-    if ("arson" %in% input$reason2 & "Dec" %in% input$month2) {
-      KernelDensityRaster <- raster(list(x = d0d$x1, y = d0d$x2, z = r12a))
-      KernelDensityRaster@data@values[which(KernelDensityRaster@data@values < 0.07)] <- NA
-
-      leafletProxy("map3") %>%
-        addRasterImage(KernelDensityRaster, colors = palRaster, opacity = .4)
-    }
-
-    if ("accident" %in% input$reason2 & "Dec" %in% input$month2) {
-      KernelDensityRaster <- raster(list(x = d0d$x1, y = d0d$x2, z = r12ac))
-      KernelDensityRaster@data@values[which(KernelDensityRaster@data@values < 0.07)] <- NA
-
-      leafletProxy("map3") %>%
-        addRasterImage(KernelDensityRaster, colors = palRaster, opacity = .4)
-    }
-
-    if ("lightning" %in% input$reason2 & "Dec" %in% input$month2) {
-      KernelDensityRaster <- raster(list(x = d0d$x1, y = d0d$x2, z = r12l))
-      KernelDensityRaster@data@values[which(KernelDensityRaster@data@values < 0.07)] <- NA
-
-      leafletProxy("map3") %>%
-        addRasterImage(KernelDensityRaster, colors = palRaster, opacity = .4)
-    }
-
-    if ("burningoff" %in% input$reason2 & "Dec" %in% input$month2) {
-      KernelDensityRaster <- raster(list(x = d0d$x1, y = d0d$x2, z = r12b))
-      KernelDensityRaster@data@values[which(KernelDensityRaster@data@values < 0.07)] <- NA
-
-      leafletProxy("map3") %>%
-        addRasterImage(KernelDensityRaster, colors = palRaster, opacity = .4)
-    }
-
-    if ("arson" %in% input$reason2 & "Jan" %in% input$month2) {
-      KernelDensityRaster <- raster(list(x = d0d$x1, y = d0d$x2, z = r1a))
-      KernelDensityRaster@data@values[which(KernelDensityRaster@data@values < 0.07)] <- NA
-
-      leafletProxy("map3") %>%
-        addRasterImage(KernelDensityRaster, colors = palRaster, opacity = .4)
-    }
-
-    if ("accident" %in% input$reason2 & "Jan" %in% input$month2) {
-      KernelDensityRaster <- raster(list(x = d0d$x1, y = d0d$x2, z = r1ac))
-      KernelDensityRaster@data@values[which(KernelDensityRaster@data@values < 0.07)] <- NA
-
-      leafletProxy("map3") %>%
-        addRasterImage(KernelDensityRaster, colors = palRaster, opacity = .4)
-    }
-
-    if ("lightning" %in% input$reason2 & "Jan" %in% input$month2) {
-      KernelDensityRaster <- raster(list(x = d0d$x1, y = d0d$x2, z = r1l))
-      KernelDensityRaster@data@values[which(KernelDensityRaster@data@values < 0.07)] <- NA
-
-      leafletProxy("map3") %>%
-        addRasterImage(KernelDensityRaster, colors = palRaster, opacity = .4)
-    }
-
-    if ("burningoff" %in% input$reason2 & "Jan" %in% input$month2) {
-      KernelDensityRaster <- raster(list(x = d0d$x1, y = d0d$x2, z = r1b))
-      KernelDensityRaster@data@values[which(KernelDensityRaster@data@values < 0.07)] <- NA
-
-      leafletProxy("map3") %>%
-        addRasterImage(KernelDensityRaster, colors = palRaster, opacity = .4)
-    }
-
-    if ("arson" %in% input$reason2 & "Feb" %in% input$month2) {
-      KernelDensityRaster <- raster(list(x = d0d$x1, y = d0d$x2, z = r2a))
-      KernelDensityRaster@data@values[which(KernelDensityRaster@data@values < 0.07)] <- NA
-
-      leafletProxy("map3") %>%
-        addRasterImage(KernelDensityRaster, colors = palRaster, opacity = .4)
-    }
-
-    if ("accident" %in% input$reason2 & "Feb" %in% input$month2) {
-      KernelDensityRaster <- raster(list(x = d0d$x1, y = d0d$x2, z = r2ac))
-      KernelDensityRaster@data@values[which(KernelDensityRaster@data@values < 0.07)] <- NA
-
-      leafletProxy("map3") %>%
-        addRasterImage(KernelDensityRaster, colors = palRaster, opacity = .4)
-    }
-
-    if ("lightning" %in% input$reason2 & "Feb" %in% input$month2) {
-      KernelDensityRaster <- raster(list(x = d0d$x1, y = d0d$x2, z = r2l))
-      KernelDensityRaster@data@values[which(KernelDensityRaster@data@values < 0.07)] <- NA
-
-      leafletProxy("map3") %>%
-        addRasterImage(KernelDensityRaster, colors = palRaster, opacity = .4)
-    }
-
-    if ("burningoff" %in% input$reason2 & "Feb" %in% input$month2) {
-      KernelDensityRaster <- raster(list(x = d0d$x1, y = d0d$x2, z = r2b))
-      KernelDensityRaster@data@values[which(KernelDensityRaster@data@values < 0.07)] <- NA
-
-      leafletProxy("map3") %>%
-        addRasterImage(KernelDensityRaster, colors = palRaster, opacity = .4)
-    }
-
-    if ("arson" %in% input$reason2 & "Mar" %in% input$month2) {
-      KernelDensityRaster <- raster(list(x = d0d$x1, y = d0d$x2, z = r3a))
-      KernelDensityRaster@data@values[which(KernelDensityRaster@data@values < 0.07)] <- NA
-
-      leafletProxy("map3") %>%
-        addRasterImage(KernelDensityRaster, colors = palRaster, opacity = .4)
-    }
-
-    if ("accident" %in% input$reason2 & "Mar" %in% input$month2) {
-      KernelDensityRaster <- raster(list(x = d0d$x1, y = d0d$x2, z = r3ac))
-      KernelDensityRaster@data@values[which(KernelDensityRaster@data@values < 0.07)] <- NA
-
-      leafletProxy("map3") %>%
-        addRasterImage(KernelDensityRaster, colors = palRaster, opacity = .4)
-    }
-
-    if ("lightning" %in% input$reason2 & "Mar" %in% input$month2) {
-      KernelDensityRaster <- raster(list(x = d0d$x1, y = d0d$x2, z = r3l))
-      KernelDensityRaster@data@values[which(KernelDensityRaster@data@values < 0.07)] <- NA
-
-      leafletProxy("map3") %>%
-        addRasterImage(KernelDensityRaster, colors = palRaster, opacity = .4)
-    }
-
-    if ("burningoff" %in% input$reason2input$reason2 & "Mar" %in% input$month2) {
-      KernelDensityRaster <- raster(list(x = d0d$x1, y = d0d$x2, z = r3b))
-      KernelDensityRaster@data@values[which(KernelDensityRaster@data@values < 0.07)] <- NA
-
-      leafletProxy("map3") %>%
-        addRasterImage(KernelDensityRaster, colors = palRaster, opacity = .4)
-    }
+    KernelDensityRaster <- raster(
+      list(
+        x = d0d$x1, y = d0d$x2,
+        z = risk_map[[input$reason2]][[input$month2]]
+      )
+    )
+    KernelDensityRaster@data@values[
+      which(KernelDensityRaster@data@values < density_cutoff_value)
+    ] <- NA
+    leafletProxy("map3") %>%
+      addRasterImage(KernelDensityRaster, colors = palRaster, opacity = .4)
   })
 
   output$data <- DT::renderDataTable(datatable(
