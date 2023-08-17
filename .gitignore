@@ -1,2 +1,6 @@
 VICfire/renv/
-
+*.Rproj
+.vscode/
+.Rproj.user
+.Rhistory
+scratch_1.R
