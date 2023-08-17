@@ -15,7 +15,9 @@ library(raster)
 library(DT)
 library(htmlwidgets)
 
-source("logic/color_palettes.R")
-
-# Load in training data
 load("data/save.RData")
+# Load in training data
+
+# save.RData has a set of color palettes defined inside
+# that conflicts with the palettes for the Shinyapp
+source("logic/color_palettes.R")

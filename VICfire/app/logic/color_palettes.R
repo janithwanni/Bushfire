@@ -12,8 +12,8 @@ pal2 <- colorFactor(
   domain = c(0, 1)
 )
 
-palRaster <- colorNumeric(
-    palette = c("yellow", "Red"),
-    domain = c(1, 0),
-    na.color = "transparent"
+palRaster <- colorNumeric( # nolint: object_name_linter
+  palette = c("yellow", "red"),
+  domain = c(1, 0),
+  na.color = "transparent"
 )
