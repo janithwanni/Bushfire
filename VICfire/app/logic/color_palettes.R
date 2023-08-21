@@ -23,3 +23,15 @@ palRaster <- leaflet::colorNumeric( # nolint: object_name_linter
   domain = c(1, 0),
   na.color = "transparent"
 )
+
+
+# leaflet density color palettes
+#' @export
+density_colors <- c(
+  "accident" = "#E69F00",
+  "arson" = "#000000",
+  "burningoff" = "#0072B2",
+  "lightning" = "#009E73",
+  "other" = "#F0E442",
+  "relight" = "#CC79A7"
+)

@@ -6,18 +6,11 @@ box::use(
     outputOptions,
     renderText
   ],
-  sp[
-    Polygon,
-    SpatialPolygonsDataFrame,
-    SpatialPolygons
-  ],
   dplyr[
     filter,
     group_by
   ],
-  KernSmooth[bkde2D],
   magrittr[`%>%`],
-  grDevices[contourLines],
   plotly[
     renderPlotly,
     plot_ly,
@@ -65,7 +58,14 @@ box::use(
   ],
   app/logic/constants[density_cutoff_value],
   app/logic/color_palettes[
-    pal, pal1, pal2, palRaster
+    pal,
+    pal1,
+    pal2,
+    palRaster,
+    density_colors
+  ],
+  app/logic/calculate_density[
+    calculate_density
   ],
   app/views/mod_fire_risk_map,
   app/views/mod_predicted_causes
@@ -77,161 +77,19 @@ server <- function(input, output) {
   mod_fire_risk_map$server("fire_risk_map")
   mod_predicted_causes$server("predicted_causes")
 
-  # subsets mydata based on year selector
-  dataselected_1 <- reactive({
-    mydata <- subset(mydata, year >= input$year[1] & year <= input$year[2])
-  })
-
-  # subsets mydata based on month selector
-  dataselected_2 <- reactive({
-    mydata <- subset(dataselected_1(), month %in% input$month)
-  })
-
-  # subsets mydata based on reason
-  dataselected <- reactive({
-    if (is.null(input$reason)) {
-      subset(dataselected_2(), new_cause == 1)
-    } else {
-      dataselected_2() %>% filter(new_cause %in% input$reason)
+  filtered_data <- reactive({
+    if (!is.null(input$year)) {
+      mydata <- mydata %>% filter(year >= input$year[1] & year <= input$year[2])
     }
-  })
-
-  # density polygons
-  selectedarson <- reactive({
-    dataselected() %>% filter(new_cause == "arson")
-  })
-  d2d_arson <- reactive({
-    bkde2D(
-      cbind(selectedarson()$lon, selectedarson()$lat),
-      bandwidth = c(0.15, 0.15)
-    )
-  })
-  lines_arson <- reactive({
-    contourLines(d2d_arson()$x1, d2d_arson()$x2, d2d_arson()$fhat)
-  })
-  dd1_arson <- reactive({
-    sapply(1:length(lines_arson()), function(i) Polygon(as.matrix(cbind(lines_arson()[[i]]$x, lines_arson()[[i]]$y))))
-  })
-  dd2_arson <- reactive({
-    sapply(1:length(lines_arson()), function(i) Polygons(list(dd1_arson()[[i]]), i))
-  })
-  poly_data_arson <- reactive({
-    data.frame(Value = sapply(1:length(lines_arson()), function(i) lines_arson()[[i]]$level))
-  })
-  dd3_arson <- reactive({
-    SpatialPolygonsDataFrame(SpatialPolygons(dd2_arson()), data = poly_data_arson())
-  })
-
-  selectedlightning <- reactive({
-    dataselected() %>% filter(new_cause == "lightning")
-  })
-  d2d_lightning <- reactive({
-    bkde2D(cbind(selectedlightning()$lon, selectedlightning()$lat), bandwidth = c(0.15, 0.15))
-  })
-  lines_lightning <- reactive({
-    contourLines(d2d_lightning()$x1, d2d_lightning()$x2, d2d_lightning()$fhat)
-  })
-  dd1_lightning <- reactive({
-    sapply(1:length(lines_lightning()), function(i) Polygon(as.matrix(cbind(lines_lightning()[[i]]$x, lines_lightning()[[i]]$y))))
-  })
-  dd2_lightning <- reactive({
-    sapply(1:length(lines_lightning()), function(i) Polygons(list(dd1_lightning()[[i]]), i))
-  })
-  poly_data_lightning <- reactive({
-    data.frame(Value = sapply(1:length(lines_lightning()), function(i) lines_lightning()[[i]]$level))
-  })
-  dd3_lightning <- reactive({
-    SpatialPolygonsDataFrame(SpatialPolygons(dd2_lightning()), data = poly_data_lightning())
-  })
-
-  selectedburningoff <- reactive({
-    dataselected() %>% filter(new_cause == "burningoff")
-  })
-  d2d_burningoff <- reactive({
-    bkde2D(cbind(selectedburningoff()$lon, selectedburningoff()$lat), bandwidth = c(0.15, 0.15))
-  })
-  lines_burningoff <- reactive({
-    contourLines(d2d_burningoff()$x1, d2d_burningoff()$x2, d2d_burningoff()$fhat)
-  })
-  dd1_burningoff <- reactive({
-    sapply(1:length(lines_burningoff()), function(i) Polygon(as.matrix(cbind(lines_burningoff()[[i]]$x, lines_burningoff()[[i]]$y))))
-  })
-  dd2_burningoff <- reactive({
-    sapply(1:length(lines_burningoff()), function(i) Polygons(list(dd1_burningoff()[[i]]), i))
-  })
-  poly_data_burningoff <- reactive({
-    data.frame(Value = sapply(1:length(lines_burningoff()), function(i) lines_burningoff()[[i]]$level))
-  })
-  dd3_burningoff <- reactive({
-    SpatialPolygonsDataFrame(SpatialPolygons(dd2_burningoff()), data = poly_data_burningoff())
-  })
-
-  selectedaccident <- reactive({
-    dataselected() %>% filter(new_cause == "accident")
-  })
-  d2d_accident <- reactive({
-    bkde2D(cbind(selectedaccident()$lon, selectedaccident()$lat), bandwidth = c(0.15, 0.15))
-  })
-  lines_accident <- reactive({
-    contourLines(d2d_accident()$x1, d2d_accident()$x2, d2d_accident()$fhat)
-  })
-  dd1_accident <- reactive({
-    sapply(1:length(lines_accident()), function(i) Polygon(as.matrix(cbind(lines_accident()[[i]]$x, lines_accident()[[i]]$y))))
-  })
-  dd2_accident <- reactive({
-    sapply(1:length(lines_accident()), function(i) Polygons(list(dd1_accident()[[i]]), i))
-  })
-  poly_data_accident <- reactive({
-    data.frame(Value = sapply(1:length(lines_accident()), function(i) lines_accident()[[i]]$level))
-  })
-  dd3_accident <- reactive({
-    SpatialPolygonsDataFrame(SpatialPolygons(dd2_accident()), data = poly_data_accident())
-  })
-
-
-  selectedrelight <- reactive({
-    dataselected() %>% filter(new_cause == "relight")
-  })
-  d2d_relight <- reactive({
-    bkde2D(cbind(selectedrelight()$lon, selectedrelight()$lat), bandwidth = c(0.15, 0.15))
-  })
-  lines_relight <- reactive({
-    contourLines(d2d_relight()$x1, d2d_relight()$x2, d2d_relight()$fhat)
-  })
-  dd1_relight <- reactive({
-    sapply(1:length(lines_relight()), function(i) Polygon(as.matrix(cbind(lines_relight()[[i]]$x, lines_relight()[[i]]$y))))
-  })
-  dd2_relight <- reactive({
-    sapply(1:length(lines_relight()), function(i) Polygons(list(dd1_relight()[[i]]), i))
-  })
-  poly_data_relight <- reactive({
-    data.frame(Value = sapply(1:length(lines_relight()), function(i) lines_relight()[[i]]$level))
-  })
-  dd3_relight <- reactive({
-    SpatialPolygonsDataFrame(SpatialPolygons(dd2_relight()), data = poly_data_relight())
-  })
-
-
-  selectedother <- reactive({
-    dataselected() %>% filter(new_cause == "other")
-  })
-  d2d_other <- reactive({
-    bkde2D(cbind(selectedother()$lon, selectedother()$lat), bandwidth = c(0.15, 0.15))
-  })
-  lines_other <- reactive({
-    contourLines(d2d_other()$x1, d2d_other()$x2, d2d_other()$fhat)
-  })
-  dd1_other <- reactive({
-    sapply(1:length(lines_other()), function(i) Polygon(as.matrix(cbind(lines_other()[[i]]$x, lines_other()[[i]]$y))))
-  })
-  dd2_other <- reactive({
-    sapply(1:length(lines_other()), function(i) Polygons(list(dd1_other()[[i]]), i))
-  })
-  poly_data_other <- reactive({
-    data.frame(Value = sapply(1:length(lines_other()), function(i) lines_other()[[i]]$level))
-  })
-  dd3_other <- reactive({
-    SpatialPolygonsDataFrame(SpatialPolygons(dd2_other()), data = poly_data_other())
+    if (!is.null(input$month)) {
+      mydata <- mydata %>% filter(month %in% input$month)
+    }
+    if (is.null(input$reason)) {
+      mydata <- mydata %>% filter(new_case == 1)
+    } else {
+      mydata <- mydata %>% filter(new_cause %in% input$reason)
+    }
+    mydata
   })
 
   clicked_map <- reactiveValues(clickedMarker = NULL)
@@ -246,9 +104,8 @@ server <- function(input, output) {
 
 
   clicked <- reactive(({
-    subset(dataselected(), lon == as.numeric(selected_coordinates()[1]) & lat == as.numeric(selected_coordinates()[2]))
+    subset(filtered_data(), lon == as.numeric(selected_coordinates()[1]) & lat == as.numeric(selected_coordinates()[2]))
   }))
-
   condition1 <- reactive({
     if (is.null(selected_coordinates())) {
       result <- 0
@@ -284,7 +141,6 @@ server <- function(input, output) {
       )
   })
 
-
   output$temp <- renderPlotly({
     temp <- clicked()
     if (is.null(temp)) {
@@ -306,14 +162,10 @@ server <- function(input, output) {
       )
   })
 
-
-
-
   clicked_map2 <- reactiveValues(clickedMarker = NULL)
   observeEvent(input$map2_marker_click, {
     clicked_map2$clickedMarker <- input$map2_marker_click
   })
-
   selected_coordinates1 <- reactive(({
     c(clicked_map2$clickedMarker$lng, clicked_map2$clickedMarker$lat)
   }))
@@ -356,7 +208,6 @@ server <- function(input, output) {
       )
   })
 
-
   output$temp1 <- renderPlotly({
     temp1 <- clicked1()
     if (is.null(temp1)) {
@@ -384,9 +235,6 @@ server <- function(input, output) {
     group_by(new_cause) %>%
     add_lines(x = ~year, y = ~Total, legendgroup = ~new_cause)
   hist <- add_histogram(base, x = ~Total, histnorm = "probability density")
-  # TODO: Is this ggplot even being used?
-  gig <- ggplot(mydata2, aes(x = year, y = Total, fill = new_cause)) +
-    geom_bar(stat = "identity")
   fig <- plot_ly(mydata4,
     x = ~year, y = ~accident, type = "bar",
     name = "accident", marker = list(color = "#E69F00", level = 1)
@@ -419,12 +267,10 @@ server <- function(input, output) {
       )
   })
 
-
-
   output$percentage <- renderPlot({
     ggplot() +
       geom_bar(
-        data = filter(dataselected(), new_cause == input$reason),
+        data = filter(filtered_data(), new_cause == input$reason),
         aes(x = year, y = fire, fill = new_cause, label = "fire"), stat = "identity"
       ) +
       scale_fill_manual("legend",
@@ -459,7 +305,7 @@ server <- function(input, output) {
     leafletProxy("map") %>%
       clearMarkers() %>%
       addCircleMarkers(
-        data = dataselected(), lat = ~lat, lng = ~lon,
+        data = filtered_data(), lat = ~lat, lng = ~lon,
         radius = 3,
         color = ~ pal(new_cause),
         stroke = FALSE, fillOpacity = 20,
@@ -475,45 +321,20 @@ server <- function(input, output) {
   })
 
   observeEvent(input$showd, {
+    req(!is.null(input$showd), !is.null(input$reason))
     leafletProxy("map") %>%
       addTiles() %>%
       clearGroup(group = "plot density")
 
-    if ("accident" %in% input$reason) {
-      leafletProxy("map") %>%
-        addTiles() %>% # TODO Move col arguments to color palette based ones
-        addPolygons(data = dd3_accident(), col = "#E69F00", group = "plot density", stroke = FALSE)
-    }
-
-    if ("arson" %in% input$reason) {
-      leafletProxy("map") %>%
-        addTiles() %>% # TODO Move col arguments to color palette based ones
-        addPolygons(data = dd3_arson(), col = "#000000", group = "plot density", stroke = FALSE)
-    }
-
-    if ("burningoff" %in% input$reason) {
-      leafletProxy("map") %>%
-        addTiles() %>% # TODO Move col arguments to color palette based ones
-        addPolygons(data = dd3_burningoff(), col = "#0072B2", group = "plot density", stroke = FALSE)
-    }
-
-    if ("lightning" %in% input$reason) {
-      leafletProxy("map") %>%
-        addTiles() %>% # TODO Move col arguments to color palette based ones
-        addPolygons(data = dd3_lightning(), col = "#009E73", group = "plot density", stroke = FALSE)
-    }
-
-    if ("other" %in% input$reason) {
-      leafletProxy("map") %>%
-        addTiles() %>% # TODO Move col arguments to color palette based ones
-        addPolygons(data = dd3_other(), col = "#F0E442", group = "plot density", stroke = FALSE)
-    }
-
-    if ("relight" %in% input$reason) {
-      leafletProxy("map") %>%
-        addTiles() %>% # TODO Move col arguments to color palette based ones
-        addPolygons(data = dd3_relight(), col = "#CC79A7", group = "plot density", stroke = FALSE)
-    }
+    density_calculated <- calculate_density(filtered_data(), input$reason)
+    leafletProxy("map") %>%
+      addTiles() %>% # TODO Move col arguments to color palette based ones
+      addPolygons(
+        data = density_calculated,
+        col = density_colors[input$reason],
+        group = "plot density",
+        stroke = FALSE
+      )
   })
 
   observeEvent(input$cleard, {
